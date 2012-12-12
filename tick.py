@@ -5,16 +5,16 @@ def ticks(series, maxvalue, roundfn):
     '''Use the `series` modules to generate a range for the `maxvalue`.
     Use the `roundfn` for rounding.'''
     imaxvalue = int(maxvalue)
+
     remainder = float(imaxvalue % series)
 
     # Approximate range aximum
     floor_maxtick = int(imaxvalue - remainder)
 
     # Adjust by rounding
-    adjustment = series * roundfn(remainder / imaxvalue)
+    adjustment = series * roundfn(remainder / series)
 
-    print int(floor_maxtick + adjustment)
-    return range(0, int(floor_maxtick + adjustment), series)
+    return range(0, series + int(floor_maxtick + adjustment), series)
 
 def ticks10(series, maxvalue, roundfn):
     '''Run the `ticks` function on the maxvalue times ten, and return the

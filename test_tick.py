@@ -8,7 +8,7 @@ def test_1s_round():
     n.assert_equal(o, e)
 
 def test_2s_floor():
-    o = ticks(1, 3, floor)
+    o = ticks(2, 3, floor)
     e = [0, 2]
     n.assert_equal(o, e)
 
@@ -29,7 +29,7 @@ def test_5s_floor():
 
 def test_5s_round():
     o = ticks(5, 22, round)
-    e = [0, 5, 10, 15, 20, 25]
+    e = [0, 5, 10, 15, 20]
     n.assert_equal(o, e)
 
 def test_5s_ceil():
