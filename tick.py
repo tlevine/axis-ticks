@@ -31,6 +31,9 @@ def _best_option_with_n_ticks(nticks, option_closeness, options):
 
 def try_many(maxvalue, nticks, try_above = True, try_below = True):
     'I take the maximum of the data and the maximum acceptable ticks.'
+    if maxvalue == 0:
+        return [0]
+
     magnitude = 10**math.floor(math.log(maxvalue, 10))
     standardized_maxvalue = maxvalue / magnitude
     options = []
