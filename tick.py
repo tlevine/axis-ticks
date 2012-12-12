@@ -29,7 +29,7 @@ def _best_option_with_n_ticks(nticks, option_closeness, options):
     else:
         return None
 
-def try_many(maxvalue, nticks):
+def try_many(maxvalue, nticks, try_above = True, try_below = True):
     'I take the maximum of the data and the maximum acceptable ticks.'
     magnitude = 10**math.floor(math.log(maxvalue, 10))
     standardized_maxvalue = maxvalue / magnitude
@@ -49,9 +49,9 @@ def try_many(maxvalue, nticks):
     while True:
         up = _best_option_with_n_ticks(nticks + adjustment, option_closeness, options)
         down = _best_option_with_n_ticks(nticks - adjustment, option_closeness, options)
-        if up:
+        if try_above and up:
             standardized_best = up
-        elif down:
+        elif try_below and down:
             standardized_best = down
         else:
             adjustment += 1
