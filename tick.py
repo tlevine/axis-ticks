@@ -67,11 +67,11 @@ if __name__ == '__main__':
     try:
         args = map(float, sys.argv[1:])
     except:
-        print usage
+        print(usage)
         exit(1)
 
     if len(args) != 2:
-        print usage
+        print(usage)
         exit(1)
 
-    print try_many(*args)
+    print(try_many(*args))
