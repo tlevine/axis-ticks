@@ -167,3 +167,157 @@ for which the max tick is close to the maximum data value and for which the
 number of tick marks is close to the desired number..
 
 Finally, add the order of magnitude back.
+
+## More ideas
+R seems to do this pretty well, but the algorithm is somewhat mysterious.
+`plot` calls `axTicks`,
+
+	axTicks
+	function (side, axp = NULL, usr = NULL, log = NULL, nintLog = NULL) 
+	{
+		if (!(side <- as.integer(side)) %in% 1L:4L) 
+		    stop("'side' must be in {1:4}")
+		is.x <- side%%2 == 1
+		XY <- function(ch) paste0(if (is.x) 
+		    "x"
+		else "y", ch)
+		if (is.null(axp)) 
+		    axp <- par(XY("axp"))
+		else if (!is.numeric(axp) || length(axp) != 3) 
+		    stop("invalid 'axp'")
+		if (is.null(log)) 
+		    log <- par(XY("log"))
+		else if (!is.logical(log) || any(is.na(log))) 
+		    stop("invalid 'log'")
+		if (log && axp[3L] > 0) {
+		    if (!any((iC <- as.integer(axp[3L])) == 1L:3L)) 
+		        stop("invalid positive 'axp[3]'")
+		    if (is.null(usr)) 
+		        usr <- par("usr")[if (is.x) 
+		            1:2
+		        else 3:4]
+		    else if (!is.numeric(usr) || length(usr) != 2) 
+		        stop("invalid 'usr'")
+		    if (is.null(nintLog)) 
+		        nintLog <- par("lab")[2L - is.x]
+		    if (is.finite(nintLog)) {
+		        axisTicks(usr, log = log, axp = axp, nint = nintLog)
+		    }
+		    else {
+		        if (needSort <- is.unsorted(usr)) {
+		            usr <- usr[2:1]
+		            axp <- axp[2:1]
+		        }
+		        else axp <- axp[1:2]
+		        ii <- round(log10(axp))
+		        x10 <- 10^((ii[1L] - (iC >= 2L)):ii[2L])
+		        r <- switch(iC, x10, c(outer(c(1, 5), x10))[-1L], 
+		            c(outer(c(1, 2, 5), x10))[-1L])
+		        if (needSort) 
+		            r <- rev(r)
+		        r[usr[1L] <= log10(r) & log10(r) <= usr[2L]]
+		    }
+		}
+		else {
+		    seq.int(axp[1L], axp[2L], length.out = 1L + abs(axp[3L]))
+		}
+	}
+	<bytecode: 0x1699bb0>
+	<environment: namespace:graphics>
+
+which calls `axisTicks`
+
+	axisTicks
+	function (usr, log, axp = NULL, nint = 5) 
+	{
+		if (is.null(axp)) 
+		    axp <- unlist(.axisPars(usr, log = log, nintLog = nint), 
+		        use.names = FALSE)
+		.Call(R_CreateAtVector, axp, if (log) 10^usr else usr, nint, 
+		    log)
+	}
+	<bytecode: 0x1f11c20>
+	<environment: namespace:grDevices>
+
+which calls `R_CreateAtVector` (in C) and `.axisPars`. `.axisPars` calls
+`R_GAxisPars` (in C).
+
+	.axisPars
+	function (usr, log = FALSE, nintLog = 5) 
+	{
+		.Call(R_GAxisPars, usr, log, nintLog)
+	}
+	<bytecode: 0x1f14620>
+	<environment: namespace:grDevices>
+
+Both of these C functions are in
+[`axis_scales.c`](https://svn.r-project.org/R/trunk/src/library/grDevices/src/axis_scales.c).
+
+    /*
+     *  R : A Computer Language for Statistical Data Analysis
+     *  Copyright (C) 2004-11   The R Core Team.
+     *
+     *  This program is free software; you can redistribute it and/or modify
+     *  it under the terms of the GNU General Public License as published by
+     *  the Free Software Foundation; either version 2 of the License, or
+     *  (at your option) any later version.
+     *
+     *  This program is distributed in the hope that it will be useful,
+     *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+     *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+     *  GNU General Public License for more details.
+     *
+     *  You should have received a copy of the GNU General Public License
+     *  along with this program; if not, a copy is available at
+     *  http://www.r-project.org/Licenses/
+     */
+
+    #ifdef HAVE_CONFIG_H
+    #include <config.h>
+    #endif
+    
+    #include <R.h>
+    #include <Rinternals.h>
+    #include <R_ext/GraphicsEngine.h>
+     
+    #include "grDevices.h"
+
+    SEXP R_CreateAtVector(SEXP axp, SEXP usr, SEXP nint, SEXP is_log)
+    {
+        int nint_v = asInteger(nint);
+        Rboolean logflag = asLogical(is_log);
+
+        axp = coerceVector(axp, REALSXP);
+        usr = coerceVector(usr, REALSXP);
+        if(LENGTH(axp) != 3) error(_("'%s' must be numeric of length %d"), "axp", 3);
+        if(LENGTH(usr) != 2) error(_("'%s' must be numeric of length %d"), "usr", 2);
+
+        return CreateAtVector(REAL(axp), REAL(usr), nint_v, logflag);
+        // -> ../../../main/plot.c
+    }
+
+    SEXP R_GAxisPars(SEXP usr, SEXP is_log, SEXP nintLog)
+    {
+        Rboolean logflag = asLogical(is_log);
+        int n = asInteger(nintLog);// will be changed on output ..
+        double min, max;
+        const char *nms[] = {"axp", "n", ""};
+        SEXP axp, ans;
+
+        usr = coerceVector(usr, REALSXP);
+        if(LENGTH(usr) != 2) error(_("'%s' must be numeric of length %d"), "usr", 2);
+        min = REAL(usr)[0];
+        max = REAL(usr)[1];
+
+        GAxisPars(&min, &max, &n, logflag, 0);// axis = 0 :<==> do not warn.. [TODO!]
+        // -> ../../../main/graphics.c
+
+        PROTECT(ans = mkNamed(VECSXP, nms));
+        SET_VECTOR_ELT(ans, 0, (axp = allocVector(REALSXP, 2)));// protected
+        SET_VECTOR_ELT(ans, 1, ScalarInteger(n));
+        REAL(axp)[0] = min;
+        REAL(axp)[1] = max;
+
+        UNPROTECT(1);
+        return ans;
+    }
