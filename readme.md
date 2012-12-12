@@ -1,6 +1,15 @@
 Where should ticks be for a given plot?
 ====
 
+## How to use
+Clone this repository, then run this.
+
+    ./tick.py [max data value] [desired tick count] 
+
+For example, to choose about eight ticks for data whose maximum is 234234.
+
+    ./tick.py 234234 8
+
 ## Brainstorm
 
 Let's start with just knowledge of the maximum value.
