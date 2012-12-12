@@ -8,11 +8,12 @@ def ticks(series, maxvalue, roundfn):
     remainder = float(imaxvalue % series)
 
     # Approximate range aximum
-    floor_maxtick = int(series * (imaxvalue - remainder))
+    floor_maxtick = int(imaxvalue - remainder)
 
     # Adjust by rounding
-    adjustment = roundfn(remainder / imaxvalue)
+    adjustment = series * roundfn(remainder / imaxvalue)
 
+    print int(floor_maxtick + adjustment)
     return range(0, int(floor_maxtick + adjustment), series)
 
 def ticks10(series, maxvalue, roundfn):
