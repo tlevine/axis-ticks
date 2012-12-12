@@ -403,3 +403,9 @@ get the version for k in {1,5}, and if it's 3, we get it for k in {1, 2, 5}.
 
     r <- switch(iC, x10, c(outer(c(1, 5), x10))[-1L], 
         c(outer(c(1, 2, 5), x10))[-1L])
+
+And then `r` is subset somehow.
+
+    r[usr[1L] <= log10(r) & log10(r) <= usr[2L]]
+
+And then I went to sleep.
