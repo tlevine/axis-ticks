@@ -1,28 +1,38 @@
 import nose.tools as n
 from tick import *
+from math import ceil, floor
 
-def tick_range_1s_round0(maxtick):
-    o = tick_range_1s_round0(3.2)
-    e = [0]
-    n.assert_list_equal(o, e)
-
-    o = tick_range_1s_round0(5.2)
-    e = [0, 1]
-    n.assert_list_equal(o, e)
-
-def tick_range_1s_round1(maxtick):
-    o = tick_range_1s_round1(3.2)
+def test_1s_round():
+    o = ticks(1, 3, round)
     e = [0, 1, 2, 3]
-    n.assert_list_equal(o, e)
+    n.assert_equal(o, e)
 
-def tick_range_2s_round0(maxtick):
-    # Treating it as 0.3
-    o = tick_range_1s_round0(3.2)
-    e = [0, 1, 2, 3]
-    n.assert_list_equal(o, e)
+def test_2s_floor():
+    o = ticks(1, 3, floor)
+    e = [0, 2]
+    n.assert_equal(o, e)
 
-def tick_range_2s_round1(maxtick):
-    # Treating it as 3
-    o = tick_range_1s_round1(3.2)
-    e = [0, 1, 2, 3]
-    n.assert_list_equal(o, e)
+def test_2s_round():
+    o = ticks(2, 3, round)
+    e = [0, 2, 4]
+    n.assert_equal(o, e)
+
+def test_2s_ceil():
+    o = ticks(1, 3, ceil)
+    e = [0, 2, 4]
+    n.assert_equal(o, e)
+
+def test_5s_floor():
+    o = ticks(1, 3, floor)
+    e = [0, 2]
+    n.assert_equal(o, e)
+
+def test_5s_round():
+    o = ticks(2, 3, round)
+    e = [0, 2, 4]
+    n.assert_equal(o, e)
+
+def test_5s_ceil():
+    o = ticks(1, 3, ceil)
+    e = [0, 2, 4]
+    n.assert_equal(o, e)
