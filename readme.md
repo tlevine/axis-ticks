@@ -39,5 +39,10 @@ not fine if the max number is 180 or 200. What should we do here? So we
 can't limit number bases to just **1s**.
 
 ## Idea
-Propose a few tick ranges based on the number bases, then choose the one
+First, express the maximum value in scientific notation. Work only with the
+part that's not an exponent of ten; add that part back in at the end.
+
+Second, propose a few tick ranges based on the number bases. Choose the one
 for which the max tick is closest to the maximum data value.
+
+Finally, add the order of magnitude back.
