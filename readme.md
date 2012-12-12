@@ -9,6 +9,12 @@ Clone this repository, then run this.
 For example, to choose about eight ticks for data whose maximum is 234234.
 
     ./tick.py 234234 8
+    [0.0, 50000.0, 100000.0, 150000.0, 200000.0, 250000.0]
+
+Or if it's 0.8080841
+
+    python2 tick.py 0.8080841 9
+    [0.0, 0.1, 0.2, 0.30000000000000004, 0.4, 0.5, 0.6000000000000001, 0.7000000000000001, 0.8]
 
 Here are some more examples.
 
