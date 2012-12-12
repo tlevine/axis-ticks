@@ -5,8 +5,8 @@ def ticks(base, nticks, maxvalue):
     '''Place tick marks given a max tick number.
     The location is termined by an exponent base
     and by the number of ticks.'''
-    toptick = round(base ** round(math.log(maxvalue, base)))
-    interval = int(toptick / nticks)
+    toptick = math.ceil(base ** round(math.log(maxvalue, base)))
+    interval = int(math.ceil(toptick / nticks))
     return range(0, int(interval * nticks), interval)
 
 if __name__ == '__main__':
