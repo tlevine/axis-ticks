@@ -170,7 +170,7 @@ Finally, add the order of magnitude back.
 
 ## More ideas
 R seems to do this pretty well, but the algorithm is somewhat mysterious.
-`plot` calls `axTicks`,
+`plot` calls something equivalent `axTicks`.
 
 	axTicks
 	function (side, axp = NULL, usr = NULL, log = NULL, nintLog = NULL) 
@@ -321,3 +321,82 @@ Both of these C functions are in
         UNPROTECT(1);
         return ans;
     }
+
+The plotting code is intertwined with the tick decision code, so reading this
+is a bit unpleasant. This section of `axTicks` looks like the interesting bit.
+
+    if (needSort <- is.unsorted(usr)) {
+        usr <- usr[2:1]
+        axp <- axp[2:1]
+    }
+    else axp <- axp[1:2]
+    ii <- round(log10(axp))
+    x10 <- 10^((ii[1L] - (iC >= 2L)):ii[2L])
+    r <- switch(iC, x10, c(outer(c(1, 5), x10))[-1L], 
+        c(outer(c(1, 2, 5), x10))[-1L])
+    if (needSort) 
+        r <- rev(r)
+    r[usr[1L] <= log10(r) & log10(r) <= usr[2L]]
+
+From the `axTicks` documentation,
+
+		 axp: numeric vector of length three, defaulting to ‘par("xaxp")’
+		      or ‘par("yaxp")’ depending on the ‘side’ argument
+		      (‘par("xaxp")’ if ‘side’ is 1 or 3, ‘par("yaxp")’ if side is
+		      2 or 4).
+
+		 usr: numeric vector of length two giving user coordinate limits,
+		      defaulting to the relevant portion of ‘par("usr")’
+		      (‘par("usr")[1:2]’ or ‘par("usr")[3:4]’ for ‘side’ in (1,3)
+		      or (2,4) respectively).
+
+		 log: logical indicating if log coordinates are active; defaults to
+		      ‘par("xlog")’ or ‘par("ylog")’ depending on ‘side’.
+
+	 nintLog: (only used when ‘log’ is true): approximate (lower bound for
+		      the) number of tick intervals; defaults to ‘par("lab")[j]’
+		      where ‘j’ is 1 or 2 depending on ‘side’.  Set this to ‘Inf’
+		      if you want the same behavior as in earlier R versions (than
+		      2.14.x).
+
+I dunno how `axp` and `usr` interact, but it looks like the function cares more
+about `axp`; here's what the `?par` help says.
+
+     ‘xaxp’ A vector of the form ‘c(x1, x2, n)’ giving the coordinates
+          of the extreme tick marks and the number of intervals between
+          tick-marks when ‘par("xlog")’ is false.  Otherwise, when
+          _log_ coordinates are active, the three values have a
+          different meaning: For a small range, ‘n’ is _negative_, and
+          the ticks are as in the linear case, otherwise, ‘n’ is in
+          ‘1:3’, specifying a case number, and ‘x1’ and ‘x2’ are the
+          lowest and highest power of 10 inside the user coordinates,
+          ‘10 ^ par("usr")[1:2]’. (The ‘"usr"’ coordinates are
+          log10-transformed here!)
+
+          n=1 will produce tick marks at 10^j for integer j,
+
+          n=2 gives marks k 10^j with k in {1,5},
+
+          n=3 gives marks k 10^j with k in {1,2,5}.
+
+          See ‘axTicks()’ for a pure R implementation of this.
+
+          This parameter is reset when a user coordinate system is set
+          up, for example by starting a new page or by calling
+          ‘plot.window’ or setting ‘par("usr")’: ‘n’ is taken from
+          ‘par("lab")’.  It affects the default behaviour of subsequent
+          calls to ‘axis’ for sides 1 or 3.
+
+It looks like same algorithm as the one I happened to write.
+
+I don't know where this `iC` comes from, but I think this is the important bit
+of the code: First, make sure `axp` is ordered properly. Then separate the order
+of magnitude.
+
+    ii <- round(log10(axp))
+    x10 <- 10^((ii[1L] - (iC >= 2L)):ii[2L])
+
+I guess this is some fancy matrix algebra that does what the documentation says?
+
+    r <- switch(iC, x10, c(outer(c(1, 5), x10))[-1L], 
+        c(outer(c(1, 2, 5), x10))[-1L])
