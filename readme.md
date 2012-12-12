@@ -53,6 +53,6 @@ part that's not an exponent of ten; add that part back in at the end.
 
 Second, propose a few tick ranges based on the number bases. Choose the one
 for which the max tick is close to the maximum data value and for which the
-number of tick marks is closed to the desired number..
+number of tick marks is close to the desired number..
 
 Finally, add the order of magnitude back.
