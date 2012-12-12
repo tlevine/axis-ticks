@@ -2,6 +2,11 @@ import nose.tools as n
 from tick import *
 from math import ceil, floor
 
+def test_1s_round_10():
+    o = ticks10(1, 3, round)
+    e = [float(i)/10 for i in range(0,31)]
+    n.assert_equal(o, e)
+
 def test_1s_round():
     o = ticks(1, 3, round)
     e = [0, 1, 2, 3]
