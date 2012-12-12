@@ -62,4 +62,16 @@ def try_many(maxvalue, nticks):
 
 if __name__ == '__main__':
     import sys
-    print try_many(*map(float, sys.argv[1:]))
+    usage = 'Usage: %s [max data value] [desired tick count]' % sys.argv[0]
+
+    try:
+        args = map(float, sys.argv[1:])
+    except:
+        print usage
+        exit(1)
+
+    if len(args) != 2:
+        print usage
+        exit(1)
+
+    print try_many(*args)
