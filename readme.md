@@ -169,7 +169,8 @@ number of tick marks is close to the desired number..
 Finally, add the order of magnitude back.
 
 ## More ideas
-R seems to do this pretty well, but the algorithm is somewhat mysterious.
+R seems to do this pretty well. Actually, it seems quite similar to mine.
+But the algorithm is somewhat mysterious; I wonder how it works.
 `plot` calls something equivalent `axTicks`.
 
 	axTicks
@@ -387,7 +388,7 @@ about `axp`; here's what the `?par` help says.
           ‘par("lab")’.  It affects the default behaviour of subsequent
           calls to ‘axis’ for sides 1 or 3.
 
-It looks like same algorithm as the one I happened to write.
+That sounds like same algorithm as the one I happened to write.
 
 I don't know where this `iC` comes from, but I think this is the important bit
 of the code: First, make sure `axp` is ordered properly. Then separate the order
