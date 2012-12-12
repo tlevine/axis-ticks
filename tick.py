@@ -5,9 +5,10 @@ def ticks(base, nticks, maxvalue):
     '''Place tick marks given a max tick number.
     The location is termined by an exponent base
     and by the number of ticks.'''
-    toptick = base ** round(math.log(maxvalue, base))
-    return range(0, toptick, toptick/5)
+    toptick = round(base ** round(math.log(maxvalue, base)))
+    interval = int(toptick / nticks)
+    return range(0, int(interval * nticks), interval)
 
 if __name__ == '__main__':
     import sys
-    ticks(*sys.argv[1:])
+    print ticks(*map(float, sys.argv[1:]))
