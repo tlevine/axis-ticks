@@ -397,7 +397,9 @@ of magnitude.
     ii <- round(log10(axp))
     x10 <- 10^((ii[1L] - (iC >= 2L)):ii[2L])
 
-I guess this is some fancy matrix algebra that does what the documentation says?
+It looks like that `iC` variable is the `n` that is referenced in the `par`
+documentation. If it's 1, we get the ticks at 10^j (`x10`), if it's 2, we
+get the version for k in {1,5}, and if it's 3, we get it for k in {1, 2, 5}.
 
     r <- switch(iC, x10, c(outer(c(1, 5), x10))[-1L], 
         c(outer(c(1, 2, 5), x10))[-1L])
