@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+from copy import copy
 import math
 
 def ticks(series, maxvalue, roundfn):
@@ -22,16 +23,34 @@ def ticks10(series, maxvalue, roundfn):
     inflated = ticks(series, maxvalue * 10, roundfn)
     return [float(i)/10 for i in inflated]
 
-def try_many(maxvalue):
-    stardardized_maxvalue = maxvalue / 10**math.floor(math.log(maxvalue))
+def _best_option_with_n_ticks(nticks, options):
+    for o in sorted(zip(option_closeness, options)):
+        if len(o[1]) == _nticks:
+            standardized_best = o[1]
+            break
+
+def try_many(maxvalue, nticks):
+    'I take the maximum of the data and the maximum acceptable ticks.'
+    magnitude = 10**math.floor(math.log(maxvalue, 10))
+    standardized_maxvalue = maxvalue / magnitude
     options = []
+
+    # Generate the options
     for series in [1, 2, 5]:
         for roundfn in [math.floor, round, math.ceil]:
             options.append(ticks(series, standardized_maxvalue, roundfn))
             options.append(ticks10(series, standardized_maxvalue, roundfn))
 
-    option_maxticks = {option[-1]:option for option in enumerate(options)}
-    return option_maxticks[max(option_maxticks.keys())]
+    # Find the one whose max tick is closest
+    option_closeness = [abs(option[-1] - standardized_maxvalue) for option in options]
+
+    # Find the one closest to the desired number of ticks.
+    _nticks = copy(nticks)
+    else:
+        raise ValueError('No good tick combination was identified.')
+
+    return [i * magnitude for i in standardized_best]
 
 if __name__ == '__main__':
     import sys
+    print try_many(*map(float, sys.argv[1:]))
