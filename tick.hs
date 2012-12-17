@@ -1,3 +1,5 @@
+import Control.Applicative
+
 -- Given a round function, a base to round to, round a sharp value.
 snap :: (RealFrac a, Integral b) => (a -> b) -> b -> b -> b
 snap direction base sharp = (direction ( (fromIntegral sharp) / (fromIntegral base) ) ) * base
@@ -31,12 +33,11 @@ seqTicks :: (Ord a, Num a) => a -> a -> a -> [a]
 seqTicks interval tickMin tickMax = seqTicks' interval tickMax [tickMin]
 
 -- Given the data range, select all of the possible tick ranges.
-rangeOptions dataMin dataMax = map (map scales (map bases (map roundings dataRange)))
+rangeOptions dataMin dataMax = makeRange <$> [1, 10] <*> [1, 2, 5] <*> [floor, ceiling] $ dataRange
   where
-    scales func = map (\ scale -> func scale) [1, 10]
-    bases func = map (\ base -> func base) [1, 2, 5]
-    roundings func = map (\ rounding -> rounding func) [floor, ceiling]
-    dataRange = (dataMin, dataMax)
+    makeTick scale, base, rounding value = snap rounding base $ factorBase scale
+    makeRange scale, base, rounding (dataMin, dataMax) = map makeTick (dataMin, dataMax)
+
 
 -- Ticks from zero
 ticks0 :: (Num a, Integral b) => a -> b -> [a]
