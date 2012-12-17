@@ -2,8 +2,8 @@
 -- snap :: Integral a => (b -> a) -> a -> a -> a
 -- snap direction base sharp = (direction ( sharp / base )) * base
 
-snap :: Int -> Int -> Int
-snap base sharp = ( ( sharp `div` base )) * base
+snap :: (RealFrac a, Integral b) => (a -> b) -> b -> b -> b
+snap direction base sharp = (direction ( fromIntegral ( sharp `div` base ))) * base
 
 snapTest :: Int -> Int -> Int
 snapTest 3 5 = 6
@@ -13,6 +13,5 @@ snapTest _ _ = 0
 
 main :: IO ()
 main = do
-  --putStrLn $ show $ snap ceiling 4 7
-  let foo = snap 3 5
+  let foo = snap ceiling 3 5
   putStrLn $ show foo
