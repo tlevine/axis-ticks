@@ -30,6 +30,14 @@ seqTicks' interval tickMax ticksSoFar
 seqTicks :: (Ord a, Num a) => a -> a -> a -> [a]
 seqTicks interval tickMin tickMax = seqTicks' interval tickMax [tickMin]
 
+-- Given the data range, select all of the possible tick ranges.
+rangeOptions dataMin dataMax = map (map scales (map bases (map roundings dataRange)))
+  where
+    scales func = map (\ scale -> func scale) [1, 10]
+    bases func = map (\ base -> func base) [1, 2, 5]
+    roundings func = map (\ rounding -> rounding func) [floor, ceiling]
+    dataRange = (dataMin, dataMax)
+
 -- Ticks from zero
 ticks0 :: (Num a, Integral b) => a -> b -> [a]
 ticks0 dataMax nticks = [3]
