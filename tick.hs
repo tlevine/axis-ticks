@@ -26,7 +26,7 @@ seqTicks' interval tickMax ticksSoFar
   where
     l = last ticksSoFar
 
--- Given an interval, a maximum tick value and a list of ticks, finish the ticks.
+-- Given an interval, a minimum tick value and a maximum tick value, finish the ticks.
 seqTicks :: (Ord a, Num a) => a -> a -> a -> [a]
 seqTicks interval tickMin tickMax = seqTicks' interval tickMax [tickMin]
 
