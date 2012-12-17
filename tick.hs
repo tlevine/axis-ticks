@@ -32,14 +32,18 @@ seqTicks' interval tickMax ticksSoFar
 seqTicks :: (Ord a, Num a) => a -> a -> a -> [a]
 seqTicks interval tickMin tickMax = seqTicks' interval tickMax [tickMin]
 
--- Given the data range, select all of the possible tick ranges.
-rangeOptions :: Num a => a -> a -> [(a)]
-rangeOptions dataMin dataMax = makeRange <$> [1, 10] <*> [1, 2, 5] <*> [floor, ceiling]
+makeTick ::(RealFrac a, Integral b) => b -> b -> (a -> b) -> a -> b
+makeTick scale base rounding value = (snap rounding base $ (round significand)) * magnitude
   where
-    makeTick scale base rounding value = snap rounding base $ factorBase scale
-    makeRange scale base rounding dataRange = (makeTick' dataMin, makeTick' dataMax)
-      where
-        makeTick' = makeTick scale base rounding
+    (significand, magnitude) = factorBase scale value
+
+-- Given the data range, select all of the possible tick ranges.
+--rangeOptions :: (Num a) => a -> a -> [(a, a)]
+--rangeOptions dataMin dataMax = makeRange <$> [1, 10] <*> [1, 2, 5] <*> [floor, ceiling]
+--  where
+--    makeRange scale base rounding dataRange = (makeTick' dataMin, makeTick' dataMax)
+--      where
+--        makeTick' = makeTick scale base rounding
 
 
 -- Ticks from zero
@@ -70,5 +74,7 @@ main = do
   -- let bar = factor10 234
   --putStrLn $ show bar
 
-  let foo = seqTicks 3 0 23
-  putStrLn $ show foo
+  let foo = makeTick 1 2 floor 839
+  --let foo = rangeOptions 3.8 58.8
+  --putStrLn $ show foo
+  putStrLn $ show 3
