@@ -33,10 +33,13 @@ seqTicks :: (Ord a, Num a) => a -> a -> a -> [a]
 seqTicks interval tickMin tickMax = seqTicks' interval tickMax [tickMin]
 
 -- Given the data range, select all of the possible tick ranges.
-rangeOptions dataMin dataMax = makeRange <$> [1, 10] <*> [1, 2, 5] <*> [floor, ceiling] $ dataRange
+rangeOptions :: Num a => a -> a -> [(a)]
+rangeOptions dataMin dataMax = makeRange <$> [1, 10] <*> [1, 2, 5] <*> [floor, ceiling]
   where
-    makeTick scale, base, rounding value = snap rounding base $ factorBase scale
-    makeRange scale, base, rounding (dataMin, dataMax) = map makeTick (dataMin, dataMax)
+    makeTick scale base rounding value = snap rounding base $ factorBase scale
+    makeRange scale base rounding dataRange = (makeTick' dataMin, makeTick' dataMax)
+      where
+        makeTick' = makeTick scale base rounding
 
 
 -- Ticks from zero
