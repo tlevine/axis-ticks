@@ -31,7 +31,8 @@ seqTicks :: (Ord a, Num a) => a -> a -> a -> [a]
 seqTicks interval tickMin tickMax = seqTicks' interval tickMax [tickMin]
 
 -- Ticks from zero
-ticks0 dataMax nticks = 3
+ticks0 :: (Num a, Integral b) => a -> b -> [a]
+ticks0 dataMax nticks = [3]
 --where
 --  (significand1, magnitude1) = factor1 dataMax
 --  (significand10, magnitude10) = factor10 dataMax
