@@ -19,16 +19,16 @@ factor1 = factorBase 1
 factor10 = factorBase 10
 
 -- Given an interval, a maximum tick value and a list of ticks, finish the ticks.
-ticks' :: (Ord a, Num a) => a -> a -> [a] -> [a]
-ticks' interval tickMax ticksSoFar
+seqTicks' :: (Ord a, Num a) => a -> a -> [a] -> [a]
+seqTicks' interval tickMax ticksSoFar
   | l >= tickMax = ticksSoFar
-  | otherwise = ticks' interval tickMax $ ticksSoFar ++ [l + interval]
+  | otherwise = seqTicks' interval tickMax $ ticksSoFar ++ [l + interval]
   where
     l = last ticksSoFar
 
 -- Given an interval, a maximum tick value and a list of ticks, finish the ticks.
-ticks :: (Ord a, Num a) => a -> a -> a -> [a]
-ticks interval tickMin tickMax = ticks' interval tickMax [tickMin]
+seqTicks :: (Ord a, Num a) => a -> a -> a -> [a]
+seqTicks interval tickMin tickMax = seqTicks' interval tickMax [tickMin]
 
 main :: IO ()
 main = do
@@ -36,5 +36,5 @@ main = do
   -- let bar = factor10 234
   --putStrLn $ show bar
 
-  let foo = ticks 3 0 23
+  let foo = seqTicks 3 0 23
   putStrLn $ show foo
