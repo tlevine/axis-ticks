@@ -3,8 +3,11 @@ snap :: (RealFrac a, Integral b) => (a -> b) -> b -> b -> b
 snap direction base sharp = (direction ( (fromIntegral sharp) / (fromIntegral base) ) ) * base
 
 -- Convert a number into a significand and a power of 10.
-factor (Num a, Integral b) => a -> (b, b)
-factor _ = (3, 1000)
+factor :: (Floating a, RealFrac a) => a-> (a, a)
+factor number = (significand, magnitude)
+  where
+    magnitude = 10 ^ (floor ( logBase 10 number ))
+    significand = number / magnitude
 
 main :: IO ()
 main = do
