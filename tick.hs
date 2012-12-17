@@ -18,9 +18,23 @@ factorBase base number = (significand * base, magnitude / base)
 factor1 = factorBase 1
 factor10 = factorBase 10
 
+-- Given an interval, a maximum tick value and a list of ticks, finish the ticks.
+ticks' :: (Ord a, Num a) => a -> a -> [a] -> [a]
+ticks' interval tickMax ticksSoFar
+  | l >= tickMax = ticksSoFar
+  | otherwise = ticks' interval tickMax $ ticksSoFar ++ [l + interval]
+  where
+    l = last ticksSoFar
+
+-- Given an interval, a maximum tick value and a list of ticks, finish the ticks.
+ticks :: (Ord a, Num a) => a -> a -> a -> [a]
+ticks interval tickMin tickMax = ticks' interval tickMax [tickMin]
+
 main :: IO ()
 main = do
-  let foo = floorBase 3 7
-  let bar = factor10 234
+  -- let foo = floorBase 3 7
+  -- let bar = factor10 234
+  --putStrLn $ show bar
+
+  let foo = ticks 3 0 23
   putStrLn $ show foo
-  putStrLn $ show bar
