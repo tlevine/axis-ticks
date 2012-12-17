@@ -31,25 +31,25 @@ seqTicks :: (Ord a, Num a) => a -> a -> a -> [a]
 seqTicks interval tickMin tickMax = seqTicks' interval tickMax [tickMin]
 
 -- Ticks from zero
-ticks0 dataMax nticks
-  where
-    (significand1, magnitude1) = factor1 dataMax
-    (significand10, magnitude10) = factor10 dataMax
-    a = floorBase 1 $ significand1
-    b = floorBase 2 $ significand1
-    c = floorBase 5 $ significand1
-    d = floorBase 1 $ significand10
-    e = floorBase 2 $ significand10
-    f = floorBase 5 $ significand10
-    g = ceilingBase 1 $ significand1
-    h = ceilingBase 2 $ significand1
-    i = ceilingBase 5 $ significand1
-    j = ceilingBase 1 $ significand10
-    k = ceilingBase 2 $ significand10
-    l = ceilingBase 5 $ significand10
+ticks0 dataMax nticks = 3
+--where
+--  (significand1, magnitude1) = factor1 dataMax
+--  (significand10, magnitude10) = factor10 dataMax
+--  a = floorBase 1 $ significand1
+--  b = floorBase 2 $ significand1
+--  c = floorBase 5 $ significand1
+--  d = floorBase 1 $ significand10
+--  e = floorBase 2 $ significand10
+--  f = floorBase 5 $ significand10
+--  g = ceilingBase 1 $ significand1
+--  h = ceilingBase 2 $ significand1
+--  i = ceilingBase 5 $ significand1
+--  j = ceilingBase 1 $ significand10
+--  k = ceilingBase 2 $ significand10
+--  l = ceilingBase 5 $ significand10
 
 -- How far from ideal is the tick mark?
-distance dataMin dataMax tickSequence = ((first tickSequence) - dataMin) ^ 2 + ((last tickSequence) - dataMax) ^ 2
+distance dataMin dataMax tickSequence = ((head tickSequence) - dataMin) ^ 2 + ((last tickSequence) - dataMax) ^ 2
 
 main :: IO ()
 main = do
