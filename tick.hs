@@ -29,38 +29,30 @@ toInterval interval = (interval / (10 ^^ magnitude), magnitude)
 idealInterval :: Float -> Int -> Interval
 idealInterval dataRange nticks = toInterval $ dataRange / (fromIntegral nticks)
 
-intervalRound :: Interval -> Float -> Float
-intervalRound interval number = i * ( fromIntegral (round ( number * i )))
+intervalFloor :: Interval -> Float -> Float
+intervalFloor interval number = i * ( fromIntegral (floor ( number * i )))
   where i = fromInterval interval
 
 -- Assuming dataMin of zero and positive dataMax
 ticks' :: [Float] -> Float -> Float -> Int -> [Float]
 ticks' soFar dataMax interval nticks
-  | (last soFar) >= dataMax = soFar
-  | ((last soFar) + interval >= dataMax) && ((length soFar) >= nticks) = soFar
+  | ((last soFar) >= dataMax) && ((length soFar) > nticks) = tail soFar
+  | ((last soFar) + interval > dataMax) && ((length soFar) >= nticks) = soFar
   | otherwise = ticks' (soFar ++ [((last soFar) + interval)]) dataMax interval nticks
 
 ticks :: Float -> Float -> Int -> [Float]
---ticks dataMin dataMax nticks = ticks' [(fromIntegral (floor dataMin))] dataMax (fromInterval prev)
-ticks dataMin dataMax nticks = ticks' [dataMin] dataMax (fromInterval next) nticks
-  where
-    ideal = idealInterval (dataMax - dataMin) nticks
-    prev = prevInterval ideal
-    next = nextInterval ideal
-
-ticksZero :: Float -> Int -> [Float]
---ticks dataMin dataMax nticks = ticks' [(fromIntegral (floor dataMin))] dataMax (fromInterval prev)
-ticksZero dataMax nticks
-  | prevError <= nextError = ticks' [0] dataMax prev nticks
-  | otherwise = ticks' [0] dataMax next nticks
+ticks dataMin dataMax nticks
+  | prevError <= nextError = ticks' [start] dataMax prev nticks
+  | otherwise = ticks' [start] dataMax next nticks
     where
       nsteps = max 1 $ nticks - 1
-      ideal = idealInterval (dataMax - 0) nsteps
+      ideal = idealInterval (dataMax - dataMin) nsteps
       nsteps' = (fromIntegral nsteps)
       prev = fromInterval $ prevInterval ideal
       next = fromInterval $ nextInterval ideal
       prevError = abs ((prev * nsteps') - dataMax)
       nextError = abs ((next * nsteps') - dataMax)
+      start = intervalFloor (prevInterval ideal) dataMin
 
 test = do
   putStrLn $ show $ fromInterval $ prevInterval (6, 2)
@@ -77,8 +69,8 @@ main = do
 --putStrLn $ show $ fmap (ticks 0 324) [1..20]
 
 -- Should be 20
-  putStrLn $ show $ intervalRound (2, 10) 23
+  putStrLn $ show $ intervalFloor (2, 10) 23
 
   putStrLn $ show $ [1..20]
-  putStrLn $ show $ fmap (\ x -> length (ticksZero 324 x)) [1..20]
-  putStrLn $ show $ fmap (ticksZero 324) [1..20]
+  putStrLn $ show $ fmap (\ x -> length (ticks 0 324 x)) [1..20]
+  putStrLn $ show $ fmap (ticks 0 324) [1..20]
