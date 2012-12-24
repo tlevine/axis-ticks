@@ -76,4 +76,4 @@ main = do
   putStrLn $ show $ fmap (\ x -> length (ticks 0 324 x)) [1..20]
   putStrLn $ show $ fmap (ticks 0 324) [1..20]
 
-  putStrLn $ show $ fmap (ticks 0 824) [1..10]
+  putStrLn $ show $ fmap (ticks 3 824) [1..10]
