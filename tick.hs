@@ -30,19 +30,24 @@ idealInterval :: Float -> Int -> Interval
 idealInterval dataRange nticks = toInterval $ dataRange / (fromIntegral nticks)
 
 -- Assuming dataMin of zero and positive dataMax
-ticks :: [Float] -> Float -> Float -> [Float]
-ticks soFar dataMax interval
+ticks' :: [Float] -> Float -> Float -> [Float]
+ticks' soFar dataMax interval
   | (last soFar) >= dataMax = soFar
-  | otherwise = ticks (soFar ++ [((last soFar) + interval)]) dataMax interval
+  | otherwise = ticks' (soFar ++ [((last soFar) + interval)]) dataMax interval
 
---  where
---    interval = toInterval $ dataMax - (floor (head soFar))
---    prev = prevInterval interval
---    next = nextInterval interval
+ticks :: Float -> Float -> Int -> [Float]
+--ticks dataMin dataMax nticks = ticks' [(fromIntegral (floor dataMin))] dataMax (fromInterval prev)
+ticks dataMin dataMax nticks = ticks' [dataMin] dataMax (fromInterval next)
+  where
+    ideal = idealInterval (dataMax - dataMin) nticks
+    prev = prevInterval ideal
+    next = nextInterval ideal
 
 main = do
   putStrLn $ show $ fromInterval $ prevInterval (6, 2)
   putStrLn $ show $ fromInterval $ idealInterval 8.1234 4
   putStrLn $ show $ fromInterval $ prevInterval $ idealInterval 8.1234 4
   putStrLn $ show $ fromInterval $ nextInterval $ idealInterval 8.1234 4
-  putStrLn $ show $ ticks [0] 324 50
+  putStrLn $ show $ fromInterval $ nextInterval $ idealInterval 324 8
+  putStrLn $ show $ ticks' [0] 324 50
+  putStrLn $ show $ ticks 0 324 8
