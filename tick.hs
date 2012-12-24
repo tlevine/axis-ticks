@@ -42,10 +42,11 @@ ticks' soFar dataMax interval nticks
 
 ticks :: Float -> Float -> Int -> [Float]
 ticks dataMin dataMax nticks
-  | prevError <= nextError = ticks' [start] dataMax prev nticks
-  | otherwise = ticks' [start] dataMax next nticks
+  | prevError <= nextError = ticks' [start] dataMax prev nticks'
+  | otherwise = ticks' [start] dataMax next nticks'
     where
-      nsteps = max 1 $ nticks - 1
+      nticks' = max 2 nticks
+      nsteps = nticks' - 1
       ideal = idealInterval (dataMax - dataMin) nsteps
       nsteps' = (fromIntegral nsteps)
       prev = fromInterval $ prevInterval ideal
@@ -74,3 +75,5 @@ main = do
   putStrLn $ show $ [1..20]
   putStrLn $ show $ fmap (\ x -> length (ticks 0 324 x)) [1..20]
   putStrLn $ show $ fmap (ticks 0 324) [1..20]
+
+  putStrLn $ show $ fmap (ticks 0 824) [1..10]
