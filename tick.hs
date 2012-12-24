@@ -16,19 +16,33 @@ nextInterval (significand, magnitude)
   | otherwise = (1, magnitude + 1)
 
 -- The interval as one number
-showInterval :: Interval -> Float
-showInterval (significand, magnitude) = (significand) * 10 ^^ magnitude
+fromInterval :: Interval -> Float
+fromInterval (significand, magnitude) = (significand) * 10 ^^ magnitude
+
+toInterval :: Float -> Interval
+toInterval interval = (interval / (10 ^^ magnitude), magnitude)
+  where
+    magnitude = floor $ logBase 10 interval
 
 -- The ideal interval if humans could read weird numbers, given the difference
 -- between the highest and lowest data values
 idealInterval :: Float -> Int -> Interval
-idealInterval dataRange nticks = (width / (10 ^^ magnitude), magnitude)
-  where
-    width = dataRange / (fromIntegral nticks)
-    magnitude = floor $ logBase 10 width
+idealInterval dataRange nticks = toInterval $ dataRange / (fromIntegral nticks)
+
+-- Assuming dataMin of zero and positive dataMax
+ticks :: [Float] -> Float -> Float -> [Float]
+ticks soFar dataMax interval
+  | (last soFar) >= dataMax = soFar
+  | otherwise = ticks (soFar ++ [((last soFar) + interval)]) dataMax interval
+
+--  where
+--    interval = toInterval $ dataMax - (floor (head soFar))
+--    prev = prevInterval interval
+--    next = nextInterval interval
 
 main = do
-  putStrLn $ show $ showInterval $ prevInterval (6, 2)
-  putStrLn $ show $ showInterval $ idealInterval 8.1234 4
-  putStrLn $ show $ showInterval $ prevInterval $ idealInterval 8.1234 4
-  putStrLn $ show $ showInterval $ nextInterval $ idealInterval 8.1234 4
+  putStrLn $ show $ fromInterval $ prevInterval (6, 2)
+  putStrLn $ show $ fromInterval $ idealInterval 8.1234 4
+  putStrLn $ show $ fromInterval $ prevInterval $ idealInterval 8.1234 4
+  putStrLn $ show $ fromInterval $ nextInterval $ idealInterval 8.1234 4
+  putStrLn $ show $ ticks [0] 324 50
