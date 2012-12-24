@@ -40,8 +40,10 @@ intervalFloor interval number = i * (fromIntegral (floor ( number / i )))
 -- Assuming dataMin of zero and positive dataMax
 ticks' :: [Float] -> Float -> Float -> Int -> [Float]
 ticks' soFar dataMax interval nticks
+  | ((last soFar) >= dataMax) && (length soFar > nticks) = tail soFar
   | ((last soFar) >= dataMax) = soFar
-  | ((last soFar) + interval > dataMax) && ((length soFar) >= nticks) = soFar
+  | ((last soFar) + interval > dataMax) && ((length soFar) > nticks) = tail soFar
+  | ((last soFar) + interval > dataMax) && ((length soFar) == nticks) = soFar
   | otherwise = ticks' (soFar ++ [((last soFar) + interval)]) dataMax interval nticks
 
 ticks :: Float -> Float -> Int -> [Float]
@@ -77,8 +79,7 @@ main = do
 --putStrLn $ show $ intervalFloor (2, 1) 23
 
   putStrLn $ show $ [1..20]
-  putStrLn $ show $ fmap (\ x -> length (ticks 0 3824 x)) [1..20]
-
---putStrLn $ show $ fmap (ticks 2 324) [1..10]
+  putStrLn $ show $ fmap (\ x -> length (ticks 3 3824 x)) [1..20]
+  putStrLn $ show $ fmap (ticks 3 3824) [1..10]
 
 --putStrLn $ show $ fmap (ticks 2 824) [1..10]
