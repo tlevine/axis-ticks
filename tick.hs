@@ -30,7 +30,7 @@ idealInterval :: Float -> Int -> Interval
 idealInterval dataRange nticks = toInterval $ dataRange / (fromIntegral nticks)
 
 intervalFloor :: Interval -> Float -> Float
-intervalFloor interval number = i * ( fromIntegral (floor ( number * i )))
+intervalFloor interval number = i * (fromIntegral (floor ( number / i ))) 
   where i = fromInterval interval
 
 -- Assuming dataMin of zero and positive dataMax
@@ -70,10 +70,10 @@ main = do
 --putStrLn $ show $ fmap (ticks 0 324) [1..20]
 
 -- Should be 20
-  putStrLn $ show $ intervalFloor (2, 10) 23
+  putStrLn $ show $ intervalFloor (2, 1) 23
 
   putStrLn $ show $ [1..20]
   putStrLn $ show $ fmap (\ x -> length (ticks 0 324 x)) [1..20]
-  putStrLn $ show $ fmap (ticks 0 324) [1..20]
+  putStrLn $ show $ fmap (ticks 2 324) [1..20]
 
-  putStrLn $ show $ fmap (ticks 3 824) [1..10]
+  putStrLn $ show $ fmap (ticks 2 824) [1..10]
