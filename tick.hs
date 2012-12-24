@@ -17,8 +17,14 @@ nextInterval (significand, magnitude)
 showInterval :: Interval -> Float
 showInterval (significand, magnitude) = (significand) * 10 ^^ magnitude
 
--- The ideal interval if humans could read weird numbers
-idealInterval :: Float -> Interval
+-- The ideal interval if humans could read weird numbers, given the difference
+-- between the highest and lowest data values
+idealInterval :: Float -> Int -> Interval
+idealInterval dataRange nticks = (width / (10 ^^ magnitude), magnitude)
+  where
+    width = dataRange / (fromIntegral nticks)
+    magnitude = floor $ logBase 10 width
 
 main = do
-  putStrLn $ show $ showInterval $ prevInterval (5, 2)
+  putStrLn $ show $ showInterval $ prevInterval (6, 2)
+  putStrLn $ show $ showInterval $ idealInterval 8.1234 4
