@@ -62,6 +62,6 @@ main = do
   putStrLn $ show $ fromInterval $ nextInterval $ idealInterval 8.1234 4
   putStrLn $ show $ fromInterval $ nextInterval $ idealInterval 324 8
   putStrLn $ show $ ticks' [0] 324 50
-  tryMany = putStrLn $ show $ ticks 0 324 
-  tryMany 8
-  tryMany 9
+  putStrLn $ show $ ticks 0 324 7
+  putStrLn $ show $ ticks 0 324 8
+  putStrLn $ show $ ticks 0 324 9
