@@ -4,6 +4,12 @@ Where should ticks be for a given plot?
 ## How to use
 Clone this repository, then run this.
 
+    ghc tick.hs
+    ./tick [minimum data value] [maximum data value] [desired tick count]
+
+You can also use the Python version, but it only supports zero as the minimum
+data value.
+
     ./tick.py [max data value] [desired tick count] 
 
 For example, to choose about eight ticks for data whose maximum is 234234.

@@ -1,3 +1,6 @@
+import System.Environment
+import Data.List.Split
+
 -- Traverse intervals in scientific notation
 type Interval = (Float, Int)
 
@@ -61,7 +64,7 @@ ticks dataMin dataMax nticks
       nextError = abs ((next * nsteps') - dataMax)
       start = intervalFloor (prevInterval ideal) dataMin
 
-test = do
+test1 = do
   putStrLn $ show $ fromInterval $ prevInterval (6, 2)
   putStrLn $ show $ fromInterval $ idealInterval 8.1234 4
   putStrLn $ show $ fromInterval $ prevInterval $ idealInterval 8.1234 4
@@ -69,7 +72,7 @@ test = do
   putStrLn $ show $ fromInterval $ nextInterval $ idealInterval 324 8
   putStrLn $ show $ ticks' [0] 324 50 8
 
-main = do
+test2 = do
 --putStrLn $ show $ [1..20]
 --putStrLn $ show $ fmap (\ x -> length (ticks 0 324 x)) [1..20]
 --putStrLn "The sequences:"
@@ -83,3 +86,17 @@ main = do
   putStrLn $ show $ fmap (ticks 3 3824) [1..10]
 
 --putStrLn $ show $ fmap (ticks 2 824) [1..10]
+
+main1 = do
+  dataStr <- getLine
+  putStrLn $ show $ maximum $ fmap (\ x -> read x :: Float) $ splitOn " " dataStr
+
+ticksFromArgs abc = ticks a b c
+  where
+    a = read (last $ take 1 abc) :: Float
+    b = read (last $ take 2 abc) :: Float
+    c = read (last $ take 3 abc) :: Int
+
+main = do
+  args <- getArgs
+  putStrLn $ show $ ticksFromArgs $ take 3 args
