@@ -4,6 +4,8 @@ type Interval = (Float, Int)
 prevInterval :: Interval -> Interval
 prevInterval (significand, magnitude)
   | significand > 5 = (5, magnitude)
+  | significand > 4 = (4, magnitude)
+  | significand > 2.5 = (2.5, magnitude)
   | significand > 2 = (2, magnitude)
   | significand > 1 = (1, magnitude)
   | otherwise = (5, magnitude - 1) 
@@ -12,6 +14,8 @@ nextInterval :: Interval -> Interval
 nextInterval (significand, magnitude)
   | significand < 1 = (1, magnitude)
   | significand < 2 = (2, magnitude)
+  | significand < 2.5 = (2.5, magnitude)
+  | significand < 4 = (4, magnitude)
   | significand < 5 = (5, magnitude)
   | otherwise = (1, magnitude + 1)
 
@@ -36,7 +40,7 @@ intervalFloor interval number = i * (fromIntegral (floor ( number / i )))
 -- Assuming dataMin of zero and positive dataMax
 ticks' :: [Float] -> Float -> Float -> Int -> [Float]
 ticks' soFar dataMax interval nticks
-  | ((last soFar) >= dataMax) && ((length soFar) > nticks) = tail soFar
+  | ((last soFar) >= dataMax) = soFar
   | ((last soFar) + interval > dataMax) && ((length soFar) >= nticks) = soFar
   | otherwise = ticks' (soFar ++ [((last soFar) + interval)]) dataMax interval nticks
 
@@ -70,10 +74,11 @@ main = do
 --putStrLn $ show $ fmap (ticks 0 324) [1..20]
 
 -- Should be 20
-  putStrLn $ show $ intervalFloor (2, 1) 23
+--putStrLn $ show $ intervalFloor (2, 1) 23
 
   putStrLn $ show $ [1..20]
-  putStrLn $ show $ fmap (\ x -> length (ticks 0 324 x)) [1..20]
-  putStrLn $ show $ fmap (ticks 2 324) [1..20]
+  putStrLn $ show $ fmap (\ x -> length (ticks 0 3824 x)) [1..20]
 
-  putStrLn $ show $ fmap (ticks 2 824) [1..10]
+--putStrLn $ show $ fmap (ticks 2 324) [1..10]
+
+--putStrLn $ show $ fmap (ticks 2 824) [1..10]
