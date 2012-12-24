@@ -43,6 +43,18 @@ ticks dataMin dataMax nticks = ticks' [dataMin] dataMax (fromInterval next)
     prev = prevInterval ideal
     next = nextInterval ideal
 
+ticksZero :: Float -> Int -> [Float]
+--ticks dataMin dataMax nticks = ticks' [(fromIntegral (floor dataMin))] dataMax (fromInterval prev)
+ticksZero dataMax nticks
+  | prevError < nextError = ticks' [0] dataMax prev
+  | otherwise = ticks' [0] dataMax next
+    where
+      ideal = idealInterval (dataMax - 0) nticks
+      prev = fromInterval $ prevInterval ideal
+      next = fromInterval $ nextInterval ideal
+      prevError = abs ((prev * (fromIntegral nticks)) - dataMax)
+      nextError = abs ((next * (fromIntegral nticks)) - dataMax)
+
 main = do
   putStrLn $ show $ fromInterval $ prevInterval (6, 2)
   putStrLn $ show $ fromInterval $ idealInterval 8.1234 4
