@@ -1,7 +1,7 @@
 import System.Environment
 import Data.List.Split
 
--- Traverse intervals in scientific notation
+-- Intervals in scientific notation
 type Interval = (Float, Int)
 
 prevInterval :: Interval -> Interval
