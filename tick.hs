@@ -29,15 +29,20 @@ toInterval interval = (interval / (10 ^^ magnitude), magnitude)
 idealInterval :: Float -> Int -> Interval
 idealInterval dataRange nticks = toInterval $ dataRange / (fromIntegral nticks)
 
+intervalRound :: Interval -> Float -> Float
+intervalRound interval number = i * ( fromIntegral (round ( number * i )))
+  where i = fromInterval interval
+
 -- Assuming dataMin of zero and positive dataMax
-ticks' :: [Float] -> Float -> Float -> [Float]
-ticks' soFar dataMax interval
+ticks' :: [Float] -> Float -> Float -> Int -> [Float]
+ticks' soFar dataMax interval nticks
   | (last soFar) >= dataMax = soFar
-  | otherwise = ticks' (soFar ++ [((last soFar) + interval)]) dataMax interval
+  | ((last soFar) + interval >= dataMax) && ((length soFar) >= nticks) = soFar
+  | otherwise = ticks' (soFar ++ [((last soFar) + interval)]) dataMax interval nticks
 
 ticks :: Float -> Float -> Int -> [Float]
 --ticks dataMin dataMax nticks = ticks' [(fromIntegral (floor dataMin))] dataMax (fromInterval prev)
-ticks dataMin dataMax nticks = ticks' [dataMin] dataMax (fromInterval next)
+ticks dataMin dataMax nticks = ticks' [dataMin] dataMax (fromInterval next) nticks
   where
     ideal = idealInterval (dataMax - dataMin) nticks
     prev = prevInterval ideal
@@ -46,8 +51,8 @@ ticks dataMin dataMax nticks = ticks' [dataMin] dataMax (fromInterval next)
 ticksZero :: Float -> Int -> [Float]
 --ticks dataMin dataMax nticks = ticks' [(fromIntegral (floor dataMin))] dataMax (fromInterval prev)
 ticksZero dataMax nticks
-  | prevError <= nextError = ticks' [0] dataMax prev
-  | otherwise = ticks' [0] dataMax next
+  | prevError <= nextError = ticks' [0] dataMax prev nticks
+  | otherwise = ticks' [0] dataMax next nticks
     where
       nsteps = max 1 $ nticks - 1
       ideal = idealInterval (dataMax - 0) nsteps
@@ -63,13 +68,16 @@ test = do
   putStrLn $ show $ fromInterval $ prevInterval $ idealInterval 8.1234 4
   putStrLn $ show $ fromInterval $ nextInterval $ idealInterval 8.1234 4
   putStrLn $ show $ fromInterval $ nextInterval $ idealInterval 324 8
-  putStrLn $ show $ ticks' [0] 324 50
+  putStrLn $ show $ ticks' [0] 324 50 8
 
 main = do
 --putStrLn $ show $ [1..20]
 --putStrLn $ show $ fmap (\ x -> length (ticks 0 324 x)) [1..20]
 --putStrLn "The sequences:"
 --putStrLn $ show $ fmap (ticks 0 324) [1..20]
+
+-- Should be 20
+  putStrLn $ show $ intervalRound (2, 10) 23
 
   putStrLn $ show $ [1..20]
   putStrLn $ show $ fmap (\ x -> length (ticksZero 324 x)) [1..20]
