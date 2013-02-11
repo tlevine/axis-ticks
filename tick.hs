@@ -40,7 +40,6 @@ intervalFloor :: Interval -> Float -> Float
 intervalFloor interval number = i * (fromIntegral (floor ( number / i ))) 
   where i = fromInterval interval
 
--- Assuming dataMin of zero and positive dataMax
 ticks' :: [Float] -> Float -> Float -> Int -> [Float]
 ticks' soFar dataMax interval nticks
   | ((last soFar) >= dataMax) && (length soFar > nticks) = tail soFar
