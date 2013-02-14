@@ -1,5 +1,7 @@
 import Tick
-main = do
+import Test.QuickCheck
+
+test1 = do
   putStrLn $ show $ fromInterval $ prevInterval (6, 2)
   putStrLn $ show $ fromInterval $ idealInterval 8.1234 4
   putStrLn $ show $ fromInterval $ prevInterval $ idealInterval 8.1234 4
@@ -21,3 +23,7 @@ test2 = do
   putStrLn $ show $ fmap (ticks 3 3824) [1..10]
 
 --putStrLn $ show $ fmap (ticks 2 824) [1..10]
+
+
+main = do
+  quickCheck (\n -> length ((ticks 3 n) [1..100]) == n)
