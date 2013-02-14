@@ -1,4 +1,11 @@
-module Tick ( ticks ) where
+module Tick
+( ticks
+, ticks'
+, fromInterval
+, idealInterval
+, prevInterval
+, nextInterval
+) where
 import System.Environment
 import Data.List.Split
 
@@ -64,30 +71,13 @@ ticks dataMin dataMax nticks
       nextError = abs ((next * nsteps') - dataMax)
       start = intervalFloor (prevInterval ideal) dataMin
 
-test2 = do
---putStrLn $ show $ [1..20]
---putStrLn $ show $ fmap (\ x -> length (ticks 0 324 x)) [1..20]
---putStrLn "The sequences:"
---putStrLn $ show $ fmap (ticks 0 324) [1..20]
-
--- Should be 20
---putStrLn $ show $ intervalFloor (2, 1) 23
-
-  putStrLn $ show $ [1..20]
-  putStrLn $ show $ fmap (\ x -> length (ticks 3 3824 x)) [1..20]
-  putStrLn $ show $ fmap (ticks 3 3824) [1..10]
-
---putStrLn $ show $ fmap (ticks 2 824) [1..10]
-
-main1 = do
-  dataStr <- getLine
-  putStrLn $ show $ maximum $ fmap (\ x -> read x :: Float) $ splitOn " " dataStr
 
 ticksFromArgs abc = ticks a b c
   where
     a = read (last $ take 1 abc) :: Float
     b = read (last $ take 2 abc) :: Float
     c = read (last $ take 3 abc) :: Int
+
 
 main = do
   args <- getArgs
