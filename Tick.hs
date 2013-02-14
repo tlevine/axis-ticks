@@ -12,20 +12,19 @@ import Data.List.Split
 -- Distances in scientific notation
 type Distance = (Float, Int)
 
--- Function that converts one interval to another interval
+-- Function that converts one distance to another distance
 type Transformer = Distance -> Distance
 
--- Given the current tick mark, find the next tick mark.
-nextTickAbstract :: Transformer -> Transformer -> Float -> Distance -> Distance
-nextTickAbstract fn fn' distance currentTick = fn $ (fn' currentTick) + distance
+-- Distance converters
+fromDistance :: Distance -> Float
+fromDistance (significand, magnitude) = (significand) * 10 ^^ magnitude
 
--- The ideal interval if humans could read weird numbers, given the difference
--- between the highest and lowest data values
-idealDistanceAbstract :: Transformer -> Transformer -> Float -> Float -> Int -> Distance
-idealDistanceAbstract fn fn' dataMin dataMax nticks = fn $ toDistance $ dataRange / (fromIntegral nticks)
+toDistance :: Float -> Distance
+toDistance distance = (distance / (10 ^^ magnitude), magnitude)
   where
-    dataRange = (fn' dataMax) - (fn' dataMin)
+    magnitude = floor $ logBase 10 distance
 
+-- Round distances
 prevDistance :: Distance -> Distance
 prevDistance (significand, magnitude)
   | significand > 5 = (5, magnitude)
@@ -42,41 +41,50 @@ nextDistance (significand, magnitude)
   | significand < 5 = (5, magnitude)
   | otherwise = (1, magnitude + 1)
 
--- The interval as one number
-fromDistance :: Distance -> Float
-fromDistance (significand, magnitude) = (significand) * 10 ^^ magnitude
+-- Given the current tick mark, find the next tick mark.
+nextTickAbstract :: Transformer -> Transformer -> Distance -> Float -> Distance
+nextTickAbstract fn fn' distance currentTick = fn $ (fn' currentTick) + distance
 
-toDistance :: Float -> Distance
-toDistance interval = (interval / (10 ^^ magnitude), magnitude)
+-- The ideal distance if humans could read weird numbers, given the difference
+-- between the highest and lowest data values
+idealDistanceAbstract :: Transformer -> Transformer -> Float -> Float -> Int -> Distance
+idealDistanceAbstract fn fn' dataMin dataMax nTicks = fn $ toDistance $ dataRange / (fromIntegral nTicks)
   where
-    magnitude = floor $ logBase 10 interval
+    dataRange = (fn' dataMax) - (fn' dataMin)
 
-intervalFloor :: Distance -> Float -> Float
-intervalFloor interval number = i * (fromIntegral (floor ( number / i ))) 
-  where i = fromDistance interval
+
+ticksAbstract :: Transformer -> Transformer -> Float -> Float -> Int -> [Float]
+ticksAbstract fn fn' dataMin dataMax nTicks =
+  where
+    d = idealDistanceAbstract fn fn' dataMin dataMax $ max 2 nTicks
+    firstTick = nextTickAbstract fn fn' (nextDistance d) xxx
+
+distanceFloor :: Distance -> Float -> Float
+distanceFloor distance number = i * (fromIntegral (floor ( number / i ))) 
+  where i = fromDistance distance
 
 ticks' :: [Float] -> Float -> Float -> Int -> [Float]
-ticks' soFar dataMax interval nticks
-  | ((last soFar) >= dataMax) && (length soFar > nticks) = tail soFar
+ticks' soFar dataMax distance nTicks
+  | ((last soFar) >= dataMax) && (length soFar > nTicks) = tail soFar
   | ((last soFar) >= dataMax) = soFar
-  | ((last soFar) + interval > dataMax) && ((length soFar) > nticks) = tail soFar
-  | ((last soFar) + interval > dataMax) && ((length soFar) == nticks) = soFar
-  | otherwise = ticks' (soFar ++ [((last soFar) + interval)]) dataMax interval nticks
+  | ((last soFar) + distance > dataMax) && ((length soFar) > nTicks) = tail soFar
+  | ((last soFar) + distance > dataMax) && ((length soFar) == nTicks) = soFar
+  | otherwise = ticks' (soFar ++ [((last soFar) + distance)]) dataMax distance nTicks
 
 ticks :: Float -> Float -> Int -> [Float]
-ticks dataMin dataMax nticks
-  | prevError <= nextError = ticks' [start] dataMax prev nticks'
-  | otherwise = ticks' [start] dataMax next nticks'
+ticks dataMin dataMax nTicks
+  | prevError <= nextError = ticks' [start] dataMax prev nTicks'
+  | otherwise = ticks' [start] dataMax next nTicks'
     where
-      nticks' = max 2 nticks
-      nsteps = nticks' - 1
+      nTicks' = max 2 nTicks
+      nsteps = nTicks' - 1
       ideal = idealDistance (dataMax - dataMin) nsteps
       nsteps' = (fromIntegral nsteps)
       prev = fromDistance $ prevDistance ideal
       next = fromDistance $ nextDistance ideal
       prevError = abs ((prev * nsteps') - dataMax)
       nextError = abs ((next * nsteps') - dataMax)
-      start = intervalFloor (prevDistance ideal) dataMin
+      start = distanceFloor (prevDistance ideal) dataMin
 
 
 ticksFromArgs abc = ticks a b c
