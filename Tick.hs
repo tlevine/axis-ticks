@@ -12,6 +12,21 @@ import Data.List.Split
 -- Intervals in scientific notation
 type Interval = (Float, Int)
 
+-- Function that converts one interval to another interval
+type Transformer = Interval -> Interval
+
+-- Given the current tick mark, find the next tick mark.
+nextTickAbstract :: Transformer -> Transformer -> Float -> Interval -> Interval
+nextTickAbstract fn fn' distance currentTick = fn $ (fn' currentTick) + distance
+
+-- The ideal interval if humans could read weird numbers, given the difference
+-- between the highest and lowest data values
+idealDistanceAbstract :: Transformer -> Transformer -> Float -> Float -> Int -> Interval
+idealDistanceAbstract fn fn' dataMin dataMax nticks =
+  where
+    dataRange = (fn' dataMax) - (fn' dataMin)
+toInterval $ dataRange / (fromIntegral nticks)
+
 prevInterval :: Interval -> Interval
 prevInterval (significand, magnitude)
   | significand > 5 = (5, magnitude)
@@ -38,11 +53,6 @@ toInterval :: Float -> Interval
 toInterval interval = (interval / (10 ^^ magnitude), magnitude)
   where
     magnitude = floor $ logBase 10 interval
-
--- The ideal interval if humans could read weird numbers, given the difference
--- between the highest and lowest data values
-idealInterval :: Float -> Int -> Interval
-idealInterval dataRange nticks = toInterval $ dataRange / (fromIntegral nticks)
 
 intervalFloor :: Interval -> Float -> Float
 intervalFloor interval number = i * (fromIntegral (floor ( number / i ))) 
