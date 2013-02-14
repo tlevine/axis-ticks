@@ -1,62 +1,59 @@
 module Tick
 ( ticks
 , ticks'
-, fromInterval
-, idealInterval
-, prevInterval
-, nextInterval
+, fromDistance
+, idealDistance
+, prevDistance
+, nextDistance
 ) where
 import System.Environment
 import Data.List.Split
 
--- Intervals in scientific notation
-type Interval = (Float, Int)
+-- Distances in scientific notation
+type Distance = (Float, Int)
 
 -- Function that converts one interval to another interval
-type Transformer = Interval -> Interval
+type Transformer = Distance -> Distance
 
 -- Given the current tick mark, find the next tick mark.
-nextTickAbstract :: Transformer -> Transformer -> Float -> Interval -> Interval
+nextTickAbstract :: Transformer -> Transformer -> Float -> Distance -> Distance
 nextTickAbstract fn fn' distance currentTick = fn $ (fn' currentTick) + distance
 
 -- The ideal interval if humans could read weird numbers, given the difference
 -- between the highest and lowest data values
-idealDistanceAbstract :: Transformer -> Transformer -> Float -> Float -> Int -> Interval
-idealDistanceAbstract fn fn' dataMin dataMax nticks =
+idealDistanceAbstract :: Transformer -> Transformer -> Float -> Float -> Int -> Distance
+idealDistanceAbstract fn fn' dataMin dataMax nticks = fn $ toDistance $ dataRange / (fromIntegral nticks)
   where
     dataRange = (fn' dataMax) - (fn' dataMin)
-toInterval $ dataRange / (fromIntegral nticks)
 
-prevInterval :: Interval -> Interval
-prevInterval (significand, magnitude)
+prevDistance :: Distance -> Distance
+prevDistance (significand, magnitude)
   | significand > 5 = (5, magnitude)
   | significand > 4 = (4, magnitude)
-  | significand > 2.5 = (2.5, magnitude)
   | significand > 2 = (2, magnitude)
   | significand > 1 = (1, magnitude)
   | otherwise = (5, magnitude - 1) 
 
-nextInterval :: Interval -> Interval
-nextInterval (significand, magnitude)
+nextDistance :: Distance -> Distance
+nextDistance (significand, magnitude)
   | significand < 1 = (1, magnitude)
   | significand < 2 = (2, magnitude)
-  | significand < 2.5 = (2.5, magnitude)
   | significand < 4 = (4, magnitude)
   | significand < 5 = (5, magnitude)
   | otherwise = (1, magnitude + 1)
 
 -- The interval as one number
-fromInterval :: Interval -> Float
-fromInterval (significand, magnitude) = (significand) * 10 ^^ magnitude
+fromDistance :: Distance -> Float
+fromDistance (significand, magnitude) = (significand) * 10 ^^ magnitude
 
-toInterval :: Float -> Interval
-toInterval interval = (interval / (10 ^^ magnitude), magnitude)
+toDistance :: Float -> Distance
+toDistance interval = (interval / (10 ^^ magnitude), magnitude)
   where
     magnitude = floor $ logBase 10 interval
 
-intervalFloor :: Interval -> Float -> Float
+intervalFloor :: Distance -> Float -> Float
 intervalFloor interval number = i * (fromIntegral (floor ( number / i ))) 
-  where i = fromInterval interval
+  where i = fromDistance interval
 
 ticks' :: [Float] -> Float -> Float -> Int -> [Float]
 ticks' soFar dataMax interval nticks
@@ -73,13 +70,13 @@ ticks dataMin dataMax nticks
     where
       nticks' = max 2 nticks
       nsteps = nticks' - 1
-      ideal = idealInterval (dataMax - dataMin) nsteps
+      ideal = idealDistance (dataMax - dataMin) nsteps
       nsteps' = (fromIntegral nsteps)
-      prev = fromInterval $ prevInterval ideal
-      next = fromInterval $ nextInterval ideal
+      prev = fromDistance $ prevDistance ideal
+      next = fromDistance $ nextDistance ideal
       prevError = abs ((prev * nsteps') - dataMax)
       nextError = abs ((next * nsteps') - dataMax)
-      start = intervalFloor (prevInterval ideal) dataMin
+      start = intervalFloor (prevDistance ideal) dataMin
 
 
 ticksFromArgs abc = ticks a b c
