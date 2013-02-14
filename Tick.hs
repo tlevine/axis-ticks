@@ -1,3 +1,4 @@
+module Tick ( ticks ) where
 import System.Environment
 import Data.List.Split
 
@@ -62,14 +63,6 @@ ticks dataMin dataMax nticks
       prevError = abs ((prev * nsteps') - dataMax)
       nextError = abs ((next * nsteps') - dataMax)
       start = intervalFloor (prevInterval ideal) dataMin
-
-test1 = do
-  putStrLn $ show $ fromInterval $ prevInterval (6, 2)
-  putStrLn $ show $ fromInterval $ idealInterval 8.1234 4
-  putStrLn $ show $ fromInterval $ prevInterval $ idealInterval 8.1234 4
-  putStrLn $ show $ fromInterval $ nextInterval $ idealInterval 8.1234 4
-  putStrLn $ show $ fromInterval $ nextInterval $ idealInterval 324 8
-  putStrLn $ show $ ticks' [0] 324 50 8
 
 test2 = do
 --putStrLn $ show $ [1..20]
