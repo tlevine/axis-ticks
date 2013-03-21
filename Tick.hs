@@ -1,13 +1,11 @@
-module Tick
-( ticks
-, ticks'
-, fromDistance
-, idealDistance
-, prevDistance
-, nextDistance
-) where
-import System.Environment
-import Data.List.Split
+-- module Tick
+-- ( ticks
+-- , ticks'
+-- , fromDistance
+-- , idealDistance
+-- , prevDistance
+-- , nextDistance
+-- ) where
 
 -- Distances in scientific notation
 type Distance = (Float, Int)
@@ -23,6 +21,24 @@ toDistance :: Float -> Distance
 toDistance distance = (distance / (10 ^^ magnitude), magnitude)
   where
     magnitude = floor $ logBase 10 distance
+
+-- Given the current tick mark, find the next tick mark.
+nextTickAbstract :: Transformer -> Transformer -> Distance -> Float -> Distance
+nextTickAbstract fn fn' distance currentTick = fn $ (fn' currentTick) + distance
+
+-- The ideal distance if humans could read weird numbers, given the difference
+-- between the highest and lowest data values
+idealDistanceAbstract :: Transformer -> Transformer -> Float -> Float -> Int -> Distance
+idealDistanceAbstract fn fn' dataMin dataMax nTicks = fn $ toDistance $ dataRange / (fromIntegral nTicks)
+  where
+    dataRange = (fn' dataMax) - (fn' dataMin)
+
+nextTickPoly power d currentTick = (currentTick ^^ (1 / power) + d) ^^ power
+
+
+
+
+
 
 -- Round distances
 prevDistance :: Distance -> Distance
@@ -40,18 +56,6 @@ nextDistance (significand, magnitude)
   | significand < 4 = (4, magnitude)
   | significand < 5 = (5, magnitude)
   | otherwise = (1, magnitude + 1)
-
--- Given the current tick mark, find the next tick mark.
-nextTickAbstract :: Transformer -> Transformer -> Distance -> Float -> Distance
-nextTickAbstract fn fn' distance currentTick = fn $ (fn' currentTick) + distance
-
--- The ideal distance if humans could read weird numbers, given the difference
--- between the highest and lowest data values
-idealDistanceAbstract :: Transformer -> Transformer -> Float -> Float -> Int -> Distance
-idealDistanceAbstract fn fn' dataMin dataMax nTicks = fn $ toDistance $ dataRange / (fromIntegral nTicks)
-  where
-    dataRange = (fn' dataMax) - (fn' dataMin)
-
 
 ticksAbstract :: Transformer -> Transformer -> Float -> Float -> Int -> [Float]
 ticksAbstract fn fn' dataMin dataMax nTicks =
