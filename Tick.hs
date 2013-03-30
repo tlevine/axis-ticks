@@ -7,20 +7,7 @@
 -- , nextDistance
 -- ) where
 
--- Distances in scientific notation
-type Distance = (Float, Int)
-
--- Function that converts one distance to another distance
-type Transformer = Distance -> Distance
-
--- Distance converters
-fromDistance :: Distance -> Float
-fromDistance (significand, magnitude) = (significand) * 10 ^^ magnitude
-
-toDistance :: Float -> Distance
-toDistance distance = (distance / (10 ^^ magnitude), magnitude)
-  where
-    magnitude = floor $ logBase 10 distance
+import Notation
 
 -- Given the current tick mark, find the next tick mark.
 nextTickAbstract :: Transformer -> Transformer -> Distance -> Float -> Distance
@@ -33,8 +20,16 @@ idealDistanceAbstract fn fn' dataMin dataMax nTicks = fn $ toDistance $ dataRang
   where
     dataRange = (fn' dataMax) - (fn' dataMin)
 
+-- Inspiration
 nextTickPoly power d currentTick = (currentTick ^^ (1 / power) + d) ^^ power
 
+nextTickSqrt      = nextTickPoly (1/2)
+nextTickLinear    = nextTickPoly 1
+nextTickQuadratic = nextTickPoly 2
+nextTickCubic     = nextTickPoly 3
+
+nextTickExp base d currentTick = base ^^ ((logBase base currentTick) + d)
+nextTickLog base d currentTick = logBase base ((base ^^ currentTick) + d)
 
 
 
