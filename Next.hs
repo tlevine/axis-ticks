@@ -1,5 +1,6 @@
 module Next where
 
+import Notation
 import Distance
 
 -- Find the tick mark below the current point.
@@ -12,15 +13,15 @@ tickFloorLinear distance number = i * (fromIntegral (floor ( number / i )))
 -- Given transformer functions and any point, find the next tick mark.
 -- The point doesn't have to be a tick mark itself.
 nextTickAbstract :: Transformer -> Transformer -> Distance -> Float -> Distance
-nextTickAbstract fn fn' distance currentTick = fn $ (fn' currentTickFloored) + distance
+nextTickAbstract fn fn' distance currentTick = fn $ toDistance $ (fromDistance $ fn' currentTickFloored) + (fromDistance distance)
   where
-    currentTickFloored = tickFloorLinear distance $ fn currentTick
+    currentTickFloored = tickFloorLinear distance $ fn $ toDistance currentTick
 
 -- Given the current tick mark, find the previous tick mark.
 prevTickAbstract :: Transformer -> Transformer -> Distance -> Float -> Distance
 prevTickAbstract fn fn' distance currentTick = fn $ (fn' currentTickFloored)
   where
-    currentTickFloored = tickFloorLinear distance $ fn currentTick
+    currentTickFloored = tickFloorLinear distance $ fn $ toDistance currentTick
 
 -- Inspiration
 nextTickPoly power d currentTick = (currentTick ^^ (1 / power) + d) ^^ power

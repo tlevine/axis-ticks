@@ -1,11 +1,13 @@
 module Distance where
 
+import Notation
+
 -- The ideal distance if humans could read weird numbers, given the difference
 -- between the highest and lowest data values
 idealDistanceAbstract :: Transformer -> Transformer -> Float -> Float -> Int -> Distance
 idealDistanceAbstract fn fn' dataMin dataMax nTicks = fn $ toDistance $ dataRange / (fromIntegral nTicks)
   where
-    dataRange = (fn' dataMax) - (fn' dataMin)
+    dataRange = (fromDistance $ fn' $ toDistance dataMax) - ( fromDistance $ fn' $ toDistance dataMin)
 
 -- Round, human-readable distances
 prevDistance :: Distance -> Distance
