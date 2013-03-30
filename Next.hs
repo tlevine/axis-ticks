@@ -9,7 +9,8 @@ tickFloorLinear distance number = i * (fromIntegral (floor ( number / i )))
   where
     i = fromDistance distance
 
--- Given the current tick mark, find the next tick mark.
+-- Given transformer functions and any point, find the next tick mark.
+-- The point doesn't have to be a tick mark itself.
 nextTickAbstract :: Transformer -> Transformer -> Distance -> Float -> Distance
 nextTickAbstract fn fn' distance currentTick = fn $ (fn' currentTickFloored) + distance
   where
@@ -17,7 +18,9 @@ nextTickAbstract fn fn' distance currentTick = fn $ (fn' currentTickFloored) + d
 
 -- Given the current tick mark, find the previous tick mark.
 prevTickAbstract :: Transformer -> Transformer -> Distance -> Float -> Distance
-prevTickAbstract fn fn' distance = nextTickAbstract fn fn' (-distance)
+prevTickAbstract fn fn' distance currentTick = fn $ (fn' currentTickFloored)
+  where
+    currentTickFloored = tickFloorLinear distance $ fn currentTick
 
 -- Inspiration
 nextTickPoly power d currentTick = (currentTick ^^ (1 / power) + d) ^^ power

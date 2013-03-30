@@ -15,10 +15,9 @@ ticksAbstract :: Transformer -> Transformer -> Float -> Float -> Int -> [Float]
 ticksAbstract fn fn' dataMin dataMax nTicks =
   where
     d  = idealDistanceAbstract fn fn' dataMin dataMax $ max 2 nTicks
-    nd = nextDistance d
-    firstTick = nextTickAbstract fn fn' nd (tickFloor nd)
+    firstTick = prevTickAbstract fn fn' d dataMin
 
-
+{-
 ticks' :: [Float] -> Float -> Float -> Int -> [Float]
 ticks' soFar dataMax distance nTicks
   | ((last soFar) >= dataMax) && (length soFar > nTicks) = tail soFar
@@ -41,6 +40,7 @@ ticks dataMin dataMax nTicks
       prevError = abs ((prev * nsteps') - dataMax)
       nextError = abs ((next * nsteps') - dataMax)
       start = distanceFloor (prevDistance ideal) dataMin
+-}
 
 
 ticksFromArgs abc = ticks a b c
