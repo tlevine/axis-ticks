@@ -5,6 +5,10 @@ module Notation ( Distance
 ) where
 
 
+-- This can't be the right way to do it.
+makeOperator :: (a -> a) -> (Distance -> Distance -> Distance)
+makeOperator operator = \d1 d2 -> (toDistance $ (fromDistance d1) `operator` (fromDistance d2))
+
 -- Distances in scientific notation
 type Distance = (Float, Int)
 
