@@ -8,59 +8,16 @@
 -- ) where
 
 import Notation
-
--- Given the current tick mark, find the next tick mark.
-nextTickAbstract :: Transformer -> Transformer -> Distance -> Float -> Distance
-nextTickAbstract fn fn' distance currentTick = fn $ (fn' currentTick) + distance
-
--- The ideal distance if humans could read weird numbers, given the difference
--- between the highest and lowest data values
-idealDistanceAbstract :: Transformer -> Transformer -> Float -> Float -> Int -> Distance
-idealDistanceAbstract fn fn' dataMin dataMax nTicks = fn $ toDistance $ dataRange / (fromIntegral nTicks)
-  where
-    dataRange = (fn' dataMax) - (fn' dataMin)
-
--- Inspiration
-nextTickPoly power d currentTick = (currentTick ^^ (1 / power) + d) ^^ power
-
-nextTickSqrt      = nextTickPoly (1/2)
-nextTickLinear    = nextTickPoly 1
-nextTickQuadratic = nextTickPoly 2
-nextTickCubic     = nextTickPoly 3
-
-nextTickExp base d currentTick = base ^^ ((logBase base currentTick) + d)
-nextTickLog base d currentTick = logBase base ((base ^^ currentTick) + d)
-
-
-
-
-
--- Round distances
-prevDistance :: Distance -> Distance
-prevDistance (significand, magnitude)
-  | significand > 5 = (5, magnitude)
-  | significand > 4 = (4, magnitude)
-  | significand > 2 = (2, magnitude)
-  | significand > 1 = (1, magnitude)
-  | otherwise = (5, magnitude - 1) 
-
-nextDistance :: Distance -> Distance
-nextDistance (significand, magnitude)
-  | significand < 1 = (1, magnitude)
-  | significand < 2 = (2, magnitude)
-  | significand < 4 = (4, magnitude)
-  | significand < 5 = (5, magnitude)
-  | otherwise = (1, magnitude + 1)
+import Distance
+import Next
 
 ticksAbstract :: Transformer -> Transformer -> Float -> Float -> Int -> [Float]
 ticksAbstract fn fn' dataMin dataMax nTicks =
   where
-    d = idealDistanceAbstract fn fn' dataMin dataMax $ max 2 nTicks
-    firstTick = nextTickAbstract fn fn' (nextDistance d) xxx
+    d  = idealDistanceAbstract fn fn' dataMin dataMax $ max 2 nTicks
+    nd = nextDistance d
+    firstTick = nextTickAbstract fn fn' nd (tickFloor nd)
 
-distanceFloor :: Distance -> Float -> Float
-distanceFloor distance number = i * (fromIntegral (floor ( number / i ))) 
-  where i = fromDistance distance
 
 ticks' :: [Float] -> Float -> Float -> Int -> [Float]
 ticks' soFar dataMax distance nTicks
